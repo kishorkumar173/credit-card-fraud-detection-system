@@ -20,8 +20,7 @@ export default function Dashboard() {
   const [hour, setHour] = useState(12)
   const [result, setResult] = useState(null)
   const [stats, setStats] = useState(null)
-  const [history, setHistory] = useState([])
-
+ const [history, setHistory] = useState<any[]>([])
   // Fetch stats
   useEffect(() => {
     fetch('https://credit-card-fraud-detection-system-1-mubd.onrender.com/stats')
