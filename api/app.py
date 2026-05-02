@@ -103,3 +103,13 @@ def stats():
         "fraud_count": 492,
         "accuracy": 0.91
     }
+    
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
