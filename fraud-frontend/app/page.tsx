@@ -16,11 +16,11 @@ import {
 } from 'recharts'
 
 export default function Dashboard() {
-  const [amount, setAmount] = useState(100)
-  const [hour, setHour] = useState(12)
-  const [result, setResult] = useState(null)
-  const [stats, setStats] = useState<any>(null)
-  const [history, setHistory] = useState<any[]>([])
+const [amount, setAmount] = useState(100)
+const [hour, setHour] = useState(12)
+const [result, setResult] = useState<any>(null)
+const [stats, setStats] = useState<any>(null)
+const [history, setHistory] = useState<any[]>([])
   // Fetch stats
   useEffect(() => {
     fetch('https://credit-card-fraud-detection-system-1-mubd.onrender.com/stats')
