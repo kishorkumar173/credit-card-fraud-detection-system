@@ -1,26 +1,35 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import joblib
-import numpy as np
-import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
+import pandas as pd
+import os
 
-
-model = joblib.load("models/fraud_model.pkl")
 app = FastAPI()
 
 # =========================
-# LOAD MODEL (will load after training finishes)
+# ENABLE CORS
 # =========================
-MODEL_PATH = "models/fraud_model.pkl"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# =========================
+# LOAD MODEL (RENDER SAFE)
+# =========================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "..", "models", "fraud_model.pkl")
 
 try:
     model = joblib.load(MODEL_PATH)
     print("✅ Model loaded successfully!")
-except:
+except Exception as e:
     model = None
-    print("⚠️ Model not found yet. Waiting for training...")
+    print("❌ Model loading failed:", e)
 
 # =========================
 # INPUT SCHEMA
@@ -72,16 +81,12 @@ def home():
 def predict(tx: Transaction):
 
     if model is None:
-        return {"error": "Model not ready yet. Wait for training to finish."}
+        return {"error": "Model not loaded"}
 
     try:
-        # Convert input to DataFrame
         data = pd.DataFrame([tx.dict()])
-
-        # Predict probability
         prob = model.predict_proba(data)[0][1]
 
-        # Decision logic
         decision = "REVIEW" if prob > 0.3 else "ALLOW"
 
         return {
@@ -91,14 +96,10 @@ def predict(tx: Transaction):
 
     except Exception as e:
         return {"error": str(e)}
-    
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+# =========================
+# STATS ROUTE
+# =========================
 @app.get("/stats")
 def stats():
     return {
@@ -106,13 +107,3 @@ def stats():
         "fraud_count": 492,
         "accuracy": 0.91
     }
-    
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
