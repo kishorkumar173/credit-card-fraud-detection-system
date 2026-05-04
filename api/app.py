@@ -4,7 +4,10 @@ import joblib
 import numpy as np
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
+import joblib
 
+
+model = joblib.load("models/fraud_model.pkl")
 app = FastAPI()
 
 # =========================
